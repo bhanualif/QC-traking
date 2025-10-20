@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QC Tracking</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; }
+    h1 { color: #333; }
+    form { margin-bottom: 20px; }
+    input, button {
+      padding: 8px; margin: 5px 0;
+    }
+    .log {
+      border: 1px solid #ccc;
+      padding: 10px;
+      width: 300px;
+      background: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>QC Tracking</h1>
+
+  <h3>1️⃣ Input Device Info</h3>
+  <form id="deviceForm">
+    <label>Device ID</label><br>
+    <input type="text" id="deviceId" placeholder="misal: SBX-0001" required><br>
+
+    <label>Device Name</label><br>
+    <input type="text" id="deviceName" placeholder="misal: sound box premium" required><br>
+
+    <button type="submit">Add Device</button>
+  </form>
+
+  <h3>2️⃣ QC Checklist</h3>
+  <form id="qcForm">
+    <label>Device ID</label><br>
+    <input type="text" id="qcDeviceId" placeholder="misal: SBX-0001" required><br>
+
+    <button type="submit">Checklist QC</button>
+  </form>
+
+  <h3>📋 Log</h3>
+  <div class="log" id="log"></div>
+
+  <script>
+    // ===== Data penyimpanan (simulasi database) =====
+    const devices = [];   // daftar perangkat terdaftar
+    const qcList = [];    // daftar perangkat yang sudah QC
+
+    // ===== Fungsi untuk menambah perangkat =====
+    function addDevice(deviceId, deviceName) {
+      // Cegah duplikasi deviceId
+      const exists = devices.some(d => d.deviceId === deviceId);
+      if (exists) return `❌ Device ${deviceId} sudah terdaftar!`;
+
+      // Simpan perangkat baru
+      devices.push({ deviceId, deviceName });
+      return `✅ Device ${deviceId} (${deviceName}) berhasil ditambahkan.`;
+    }
+
+    // ===== Fungsi QC Tracking =====
+    function qcDevice(deviceId) {
+      // TODO: validasi dan simpan hasil QC
+      const found = devices.find(d => d.deviceId === deviceId);
+      if (!found) return `❌ Device ${deviceId} belum terdaftar!`;
+
+      const alreadyQC = qcList.includes(deviceId);
+      if (alreadyQC) return `⚠️ Device ${deviceId} sudah QC sebelumnya!`;
+
+      qcList.push(deviceId);
+      return `✅ Device ${deviceId} dinyatakan QC OK.`;
+    }
+
+    // ======= Helper untuk menampilkan log =======
+    const logBox = document.getElementById('log');
+    function addLog(msg) {
+      logBox.innerHTML += msg + "<br>";
+    }
+
+    // ======= Event Listener untuk form =======
+    document.getElementById('deviceForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const id = document.getElementById('deviceId').value.trim();
+      const name = document.getElementById('deviceName').value.trim();
+      const result = addDevice(id, name);
+      addLog(result);
+      e.target.reset();
+    });
+
+    document.getElementById('qcForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const id = document.getElementById('qcDeviceId').value.trim();
+      const result = qcDevice(id);
+      addLog(result);
+      e.target.reset();
+    });
+  </script>
+
+</body>
+</html>
