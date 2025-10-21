@@ -4,17 +4,113 @@
   <meta charset="UTF-8">
   <title>QC Tracking</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 30px; }
-    h1 { color: #333; }
-    form { margin-bottom: 20px; }
-    input, button {
-      padding: 8px; margin: 5px 0;
+    /* === RESET & BASE === */
+    * {
+      box-sizing: border-box;
     }
-    .log {
-      border: 1px solid #ccc;
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f0f2f5;
+      color: #333;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #1e293b;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 2rem;
+    }
+
+    h3 {
+      color: #334155;
+      margin-top: 30px;
+      margin-bottom: 10px;
+      border-left: 4px solid #2563eb;
+      padding-left: 8px;
+    }
+
+    /* === FORM CONTAINER === */
+    form {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 20px;
+      transition: 0.3s;
+    }
+
+    form:hover {
+      box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px;
+      color: #475569;
+    }
+
+    input {
+      width: 100%;
       padding: 10px;
-      width: 300px;
-      background: #f9f9f9;
+      margin-bottom: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      outline: none;
+      transition: 0.2s;
+      font-size: 0.95rem;
+    }
+
+    input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    button {
+      width: 100%;
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #1e40af;
+    }
+
+    /* === LOG SECTION === */
+    .log {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+      min-height: 100px;
+      font-size: 0.95rem;
+      color: #1e293b;
+      overflow-y: auto;
+    }
+
+    .log br {
+      margin-bottom: 5px;
+    }
+
+    /* === EMOJI COLORS (optional) === */
+    .log:has(:not(:empty)) {
+      border-left: 4px solid #2563eb;
     }
   </style>
 </head>
@@ -100,3 +196,4 @@
 
 </body>
 </html>
+
