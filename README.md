@@ -165,3 +165,35 @@ QC Checklist	SBX-9999	❌ Device SBX-9999 belum terdaftar
 
 </body>
 </html>
+
+# QC Tracking — Frontend + Backend API
+
+Proyek ini terdiri dari dua bagian:
+- **Frontend (HTML + CSS + JS)** → Form input dan QC tracking
+- **Backend (Express.js API)** → Menyimpan dan memvalidasi data device & QC
+
+---
+
+## ⚙️ Instalasi Backend
+
+```bash
+cd backend
+npm install
+npm start
+Server akan berjalan di:
+
+arduino
+Copy code
+http://localhost:3000
+🖥️ Menjalankan Frontend
+Buka file frontend/index.html langsung di browser
+atau gunakan Live Server di VSCode.
+
+🔗 Endpoint API
+Method	Endpoint	Deskripsi
+POST	/devices	Tambah device baru
+POST	/qc	Tandai device sudah QC
+GET	/devices	Ambil semua device terdaftar
+GET	/qc	Ambil semua device yang QC OK
+
+
