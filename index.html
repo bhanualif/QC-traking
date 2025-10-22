@@ -108,7 +108,6 @@
       margin-bottom: 5px;
     }
 
-    /* === EMOJI COLORS (optional) === */
     .log:has(:not(:empty)) {
       border-left: 4px solid #2563eb;
     }
@@ -141,54 +140,59 @@
   <div class="log" id="log"></div>
 
   <script>
-    // ===== Data penyimpanan (simulasi database) =====
-    const devices = [];   // daftar perangkat terdaftar
-    const qcList = [];    // daftar perangkat yang sudah QC
-
-    // ===== Fungsi untuk menambah perangkat =====
-    function addDevice(deviceId, deviceName) {
-      // Cegah duplikasi deviceId
-      const exists = devices.some(d => d.deviceId === deviceId);
-      if (exists) return `❌ Device ${deviceId} sudah terdaftar!`;
-
-      // Simpan perangkat baru
-      devices.push({ deviceId, deviceName });
-      return `✅ Device ${deviceId} (${deviceName}) berhasil ditambahkan.`;
-    }
-
-    // ===== Fungsi QC Tracking =====
-    function qcDevice(deviceId) {
-      // TODO: validasi dan simpan hasil QC
-      const found = devices.find(d => d.deviceId === deviceId);
-      if (!found) return `❌ Device ${deviceId} belum terdaftar!`;
-
-      const alreadyQC = qcList.includes(deviceId);
-      if (alreadyQC) return `⚠️ Device ${deviceId} sudah QC sebelumnya!`;
-
-      qcList.push(deviceId);
-      return `✅ Device ${deviceId} dinyatakan QC OK.`;
-    }
-
-    // ======= Helper untuk menampilkan log =======
+    const API_BASE = "http://localhost:3000";
     const logBox = document.getElementById('log');
+
     function addLog(msg) {
       logBox.innerHTML += msg + "<br>";
     }
 
-    // ======= Event Listener untuk form =======
-    document.getElementById('deviceForm').addEventListener('submit', e => {
+    // ====== ADD DEVICE via API ======
+    async function addDevice(deviceId, deviceName) {
+      try {
+        const res = await fetch(`${API_BASE}/devices`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ deviceId, deviceName })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Gagal menambah device");
+        return `✅ Device ${data.deviceId} (${data.deviceName}) berhasil ditambahkan ke server.`;
+      } catch (err) {
+        return `❌ ${err.message}`;
+      }
+    }
+
+    // ====== QC DEVICE via API ======
+    async function qcDevice(deviceId) {
+      try {
+        const res = await fetch(`${API_BASE}/qc`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ deviceId })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "QC gagal");
+        return `✅ Device ${data.deviceId} dinyatakan QC OK di server.`;
+      } catch (err) {
+        return `❌ ${err.message}`;
+      }
+    }
+
+    // ====== FORM EVENTS ======
+    document.getElementById('deviceForm').addEventListener('submit', async e => {
       e.preventDefault();
       const id = document.getElementById('deviceId').value.trim();
       const name = document.getElementById('deviceName').value.trim();
-      const result = addDevice(id, name);
+      const result = await addDevice(id, name);
       addLog(result);
       e.target.reset();
     });
 
-    document.getElementById('qcForm').addEventListener('submit', e => {
+    document.getElementById('qcForm').addEventListener('submit', async e => {
       e.preventDefault();
       const id = document.getElementById('qcDeviceId').value.trim();
-      const result = qcDevice(id);
+      const result = await qcDevice(id);
       addLog(result);
       e.target.reset();
     });
@@ -196,4 +200,3 @@
 
 </body>
 </html>
-
