@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <title>QC Tracking</title>
@@ -98,7 +98,7 @@
       padding: 20px;
       width: 100%;
       max-width: 400px;
-      min-height: 100px;
+      min-height: 120px;
       font-size: 0.95rem;
       color: #1e293b;
       overflow-y: auto;
@@ -110,6 +110,17 @@
 
     .log:has(:not(:empty)) {
       border-left: 4px solid #2563eb;
+    }
+
+    .btn-refresh {
+      width: 100%;
+      max-width: 400px;
+      margin-top: 10px;
+      background: #10b981;
+    }
+
+    .btn-refresh:hover {
+      background: #059669;
     }
   </style>
 </head>
@@ -139,15 +150,32 @@
   <h3>📋 Log</h3>
   <div class="log" id="log"></div>
 
+  <button class="btn-refresh" onclick="refreshData()">🔄 Refresh Data</button>
+
   <script>
     const API_BASE = "http://localhost:3000";
     const logBox = document.getElementById('log');
 
+    // Tambah pesan ke log
     function addLog(msg) {
-      logBox.innerHTML += msg + "<br>";
+      const time = new Date().toLocaleTimeString("id-ID", { hour12: false });
+      logBox.innerHTML += `[${time}] ${msg}<br>`;
+      logBox.scrollTop = logBox.scrollHeight;
     }
 
-    // ====== ADD DEVICE via API ======
+    // ====== CHECK API STATUS SAAT HALAMAN DIBUKA ======
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const res = await fetch(`${API_BASE}/`);
+        const data = await res.json();
+        addLog(`🌐 ${data.message}`);
+        await refreshData();
+      } catch {
+        addLog("❌ Tidak dapat terhubung ke server API");
+      }
+    });
+
+    // ====== TAMBAH DEVICE via API ======
     async function addDevice(deviceId, deviceName) {
       try {
         const res = await fetch(`${API_BASE}/devices`, {
@@ -157,7 +185,7 @@
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Gagal menambah device");
-        return `✅ Device ${data.deviceId} (${data.deviceName}) berhasil ditambahkan ke server.`;
+        return `✅ ${data.message}`;
       } catch (err) {
         return `❌ ${err.message}`;
       }
@@ -173,28 +201,53 @@
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "QC gagal");
-        return `✅ Device ${data.deviceId} dinyatakan QC OK di server.`;
+        return `✅ ${data.message}`;
       } catch (err) {
         return `❌ ${err.message}`;
       }
     }
 
-    // ====== FORM EVENTS ======
+    // ====== REFRESH DATA ======
+    async function refreshData() {
+      try {
+        const [devicesRes, qcRes] = await Promise.all([
+          fetch(`${API_BASE}/devices`),
+          fetch(`${API_BASE}/qc`)
+        ]);
+
+        const devices = await devicesRes.json();
+        const qc = await qcRes.json();
+
+        addLog(`📊 Total Device: ${devices.data.length} | QC OK: ${qc.data.length}`);
+      } catch (err) {
+        addLog("⚠️ Gagal memuat data dari server");
+      }
+    }
+
+    // ====== EVENT HANDLER FORM ======
     document.getElementById('deviceForm').addEventListener('submit', async e => {
       e.preventDefault();
       const id = document.getElementById('deviceId').value.trim();
       const name = document.getElementById('deviceName').value.trim();
+
+      if (!id || !name) return addLog("⚠️ Isi semua field sebelum menambah device.");
+
       const result = await addDevice(id, name);
       addLog(result);
       e.target.reset();
+      await refreshData();
     });
 
     document.getElementById('qcForm').addEventListener('submit', async e => {
       e.preventDefault();
       const id = document.getElementById('qcDeviceId').value.trim();
+
+      if (!id) return addLog("⚠️ Isi Device ID sebelum melakukan QC.");
+
       const result = await qcDevice(id);
       addLog(result);
       e.target.reset();
+      await refreshData();
     });
   </script>
 
