@@ -1,3 +1,4 @@
+// server.js — versi sempurna
 import express from "express";
 import cors from "cors";
 
@@ -5,48 +6,79 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const devices = [];
-const qcList = [];
+// ====== DATA IN-MEMORY ======
+let devices = [];
+let qcList = [];
 
-// Tambah device
+// ====== HELPER ======
+const success = (data, message) => ({ success: true, message, data });
+const failure = (message) => ({ success: false, error: message });
+
+// ====== ROUTES ======
+
+// Root check
+app.get("/", (req, res) => {
+  res.json(success(null, "QC Tracking API aktif 🚀"));
+});
+
+// Tambah device baru
 app.post("/devices", (req, res) => {
   const { deviceId, deviceName } = req.body;
+
   if (!deviceId || !deviceName)
-    return res.status(400).json({ error: "Semua field wajib diisi" });
+    return res.status(400).json(failure("Semua field wajib diisi"));
 
   const exists = devices.find(d => d.deviceId === deviceId);
   if (exists)
-    return res.status(400).json({ error: `Device ${deviceId} sudah terdaftar` });
+    return res.status(400).json(failure(`Device ${deviceId} sudah terdaftar`));
 
-  devices.push({ deviceId, deviceName });
-  res.json({ deviceId, deviceName });
+  const newDevice = { deviceId, deviceName };
+  devices.push(newDevice);
+
+  res.status(201).json(success(newDevice, `Device ${deviceId} berhasil ditambahkan`));
 });
 
-// QC device
+// Tandai QC OK
 app.post("/qc", (req, res) => {
   const { deviceId } = req.body;
+
   if (!deviceId)
-    return res.status(400).json({ error: "Device ID wajib diisi" });
+    return res.status(400).json(failure("Device ID wajib diisi"));
 
   const found = devices.find(d => d.deviceId === deviceId);
   if (!found)
-    return res.status(400).json({ error: `Device ${deviceId} belum terdaftar` });
+    return res.status(400).json(failure(`Device ${deviceId} belum terdaftar`));
 
   if (qcList.includes(deviceId))
-    return res.status(400).json({ error: `Device ${deviceId} sudah QC sebelumnya` });
+    return res.status(400).json(failure(`Device ${deviceId} sudah QC sebelumnya`));
 
   qcList.push(deviceId);
-  res.json({ deviceId, status: "QC OK" });
+  res.json(success({ deviceId, status: "QC OK" }, `Device ${deviceId} dinyatakan QC OK`));
 });
 
-// List semua device
+// Ambil semua device
 app.get("/devices", (req, res) => {
-  res.json(devices);
+  res.json(success(devices, "Daftar semua device"));
 });
 
-// List semua QC OK
+// Ambil semua QC OK
 app.get("/qc", (req, res) => {
-  res.json(qcList);
+  const qcDevices = devices.filter(d => qcList.includes(d.deviceId));
+  res.json(success(qcDevices, "Daftar device QC OK"));
 });
 
-app.listen(3000, () => console.log("✅ Server berjalan di http://localhost:3000"));
+// Reset data (khusus testing)
+app.delete("/reset", (req, res) => {
+  devices = [];
+  qcList = [];
+  res.json(success(null, "Semua data berhasil direset"));
+});
+
+// Middleware error handler umum
+app.use((err, req, res, next) => {
+  console.error("❌ Error:", err.message);
+  res.status(500).json(failure("Terjadi kesalahan server"));
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`✅ Server berjalan di http://localhost:${PORT}`));
