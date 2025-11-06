@@ -4,73 +4,71 @@
   <meta charset="UTF-8">
   <title>QC Tracking</title>
   <style>
-    /* === RESET & BASE === */
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
     body {
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: #f0f2f5;
-      color: #333;
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      color: #1e293b;
       margin: 0;
       padding: 40px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      padding: 30px;
+      width: 100%;
+      max-width: 500px;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     h1 {
-      color: #1e293b;
-      margin-bottom: 20px;
       text-align: center;
-      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #1e3a8a;
     }
 
     h3 {
-      color: #334155;
-      margin-top: 30px;
-      margin-bottom: 10px;
       border-left: 4px solid #2563eb;
-      padding-left: 8px;
+      padding-left: 10px;
+      color: #334155;
+      margin-top: 25px;
     }
 
-    /* === FORM CONTAINER === */
     form {
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      background: #f8fafc;
       padding: 20px;
-      width: 100%;
-      max-width: 400px;
+      border-radius: 12px;
       margin-bottom: 20px;
       transition: 0.3s;
     }
 
     form:hover {
-      box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
 
-    label {
-      font-weight: 600;
-      display: block;
-      margin-bottom: 4px;
-      color: #475569;
-    }
-
+    label { font-weight: 600; display: block; margin-bottom: 4px; color: #475569; }
     input {
       width: 100%;
       padding: 10px;
       margin-bottom: 12px;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      outline: none;
-      transition: 0.2s;
       font-size: 0.95rem;
+      transition: 0.2s;
     }
-
     input:focus {
       border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+      outline: none;
     }
 
     button {
@@ -85,171 +83,165 @@
       font-size: 0.95rem;
       transition: 0.3s;
     }
-
     button:hover {
       background: #1e40af;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(37,99,235,0.3);
     }
 
-    /* === LOG SECTION === */
     .log {
-      background: #ffffff;
+      background: #f8fafc;
       border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
       padding: 20px;
       width: 100%;
-      max-width: 400px;
-      min-height: 120px;
-      font-size: 0.95rem;
+      min-height: 100px;
+      font-size: 0.9rem;
       color: #1e293b;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
       overflow-y: auto;
     }
 
-    .log br {
-      margin-bottom: 5px;
-    }
-
-    .log:has(:not(:empty)) {
-      border-left: 4px solid #2563eb;
-    }
-
     .btn-refresh {
-      width: 100%;
-      max-width: 400px;
-      margin-top: 10px;
       background: #10b981;
     }
-
     .btn-refresh:hover {
       background: #059669;
+      box-shadow: 0 4px 10px rgba(16,185,129,0.3);
+    }
+
+    .btn-logout {
+      background: #ef4444;
+      color: white;
+      margin-bottom: 20px;
+    }
+    .btn-logout:hover {
+      background: #b91c1c;
+      box-shadow: 0 4px 10px rgba(239,68,68,0.3);
+    }
+
+    footer {
+      margin-top: 20px;
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 0.8rem;
     }
   </style>
 </head>
 <body>
 
-  <h1>QC Tracking</h1>
+  <div class="container">
+    <h1>QC Tracking</h1>
+    <button class="btn-logout" id="logoutBtn">🚪 Logout</button>
 
-  <h3>1️⃣ Input Device Info</h3>
-  <form id="deviceForm">
-    <label>Device ID</label><br>
-    <input type="text" id="deviceId" placeholder="misal: SBX-0001" required><br>
+    <h3>1️⃣ Input Device</h3>
+    <form id="deviceForm">
+      <label>Device ID</label>
+      <input type="text" id="deviceId" placeholder="misal: SBX-0001" required>
+      <label>Device Name</label>
+      <input type="text" id="deviceName" placeholder="misal: sound box premium" required>
+      <button type="submit">Tambah Device</button>
+    </form>
 
-    <label>Device Name</label><br>
-    <input type="text" id="deviceName" placeholder="misal: sound box premium" required><br>
+    <h3>2️⃣ QC Checklist</h3>
+    <form id="qcForm">
+      <label>Device ID</label>
+      <input type="text" id="qcDeviceId" placeholder="misal: SBX-0001" required>
+      <button type="submit">Checklist QC</button>
+    </form>
 
-    <button type="submit">Add Device</button>
-  </form>
+    <h3>📋 Log Aktivitas</h3>
+    <div class="log" id="log"></div>
 
-  <h3>2️⃣ QC Checklist</h3>
-  <form id="qcForm">
-    <label>Device ID</label><br>
-    <input type="text" id="qcDeviceId" placeholder="misal: SBX-0001" required><br>
+    <button class="btn-refresh" onclick="refreshData()">🔄 Refresh Data</button>
 
-    <button type="submit">Checklist QC</button>
-  </form>
-
-  <h3>📋 Log</h3>
-  <div class="log" id="log"></div>
-
-  <button class="btn-refresh" onclick="refreshData()">🔄 Refresh Data</button>
+    <footer>© 2025 QC Tracking | v2.0</footer>
+  </div>
 
   <script>
     const API_BASE = "http://localhost:3000";
-    const logBox = document.getElementById('log');
+    const token = localStorage.getItem("token");
+    const logBox = document.getElementById("log");
 
-    // Tambah pesan ke log
+    // Cek login
+    if (!token) {
+      alert("⚠️ Harus login dulu!");
+      window.location.href = "login.html";
+    }
+
     function addLog(msg) {
       const time = new Date().toLocaleTimeString("id-ID", { hour12: false });
       logBox.innerHTML += `[${time}] ${msg}<br>`;
       logBox.scrollTop = logBox.scrollHeight;
     }
 
-    // ====== CHECK API STATUS SAAT HALAMAN DIBUKA ======
-    window.addEventListener('DOMContentLoaded', async () => {
-      try {
-        const res = await fetch(`${API_BASE}/`);
-        const data = await res.json();
-        addLog(`🌐 ${data.message}`);
-        await refreshData();
-      } catch {
-        addLog("❌ Tidak dapat terhubung ke server API");
-      }
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await fetch(`${API_BASE}/logout`, { 
+        method: "POST", 
+        headers: { "Authorization": token } 
+      });
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
     });
 
-    // ====== TAMBAH DEVICE via API ======
-    async function addDevice(deviceId, deviceName) {
+    // Tambah device
+    document.getElementById("deviceForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const id = document.getElementById("deviceId").value.trim();
+      const name = document.getElementById("deviceName").value.trim();
       try {
         const res = await fetch(`${API_BASE}/devices`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ deviceId, deviceName })
+          headers: { "Content-Type": "application/json", "Authorization": token },
+          body: JSON.stringify({ deviceId: id, deviceName: name })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Gagal menambah device");
-        return `✅ ${data.message}`;
+        if (!res.ok) throw new Error(data.error);
+        addLog(`✅ ${data.message}`);
+        e.target.reset();
+        refreshData();
       } catch (err) {
-        return `❌ ${err.message}`;
+        addLog(`❌ ${err.message}`);
       }
-    }
+    });
 
-    // ====== QC DEVICE via API ======
-    async function qcDevice(deviceId) {
+    // QC device
+    document.getElementById("qcForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const id = document.getElementById("qcDeviceId").value.trim();
       try {
         const res = await fetch(`${API_BASE}/qc`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ deviceId })
+          headers: { "Content-Type": "application/json", "Authorization": token },
+          body: JSON.stringify({ deviceId: id })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "QC gagal");
-        return `✅ ${data.message}`;
+        if (!res.ok) throw new Error(data.error);
+        addLog(`✅ ${data.message}`);
+        e.target.reset();
+        refreshData();
       } catch (err) {
-        return `❌ ${err.message}`;
+        addLog(`❌ ${err.message}`);
       }
-    }
+    });
 
-    // ====== REFRESH DATA ======
+    // Refresh data
     async function refreshData() {
       try {
-        const [devicesRes, qcRes] = await Promise.all([
-          fetch(`${API_BASE}/devices`),
-          fetch(`${API_BASE}/qc`)
+        const [devRes, qcRes] = await Promise.all([
+          fetch(`${API_BASE}/devices`, { headers: { "Authorization": token } }),
+          fetch(`${API_BASE}/qc`, { headers: { "Authorization": token } })
         ]);
-
-        const devices = await devicesRes.json();
+        const dev = await devRes.json();
         const qc = await qcRes.json();
-
-        addLog(`📊 Total Device: ${devices.data.length} | QC OK: ${qc.data.length}`);
-      } catch (err) {
+        addLog(`📊 Total Device: ${dev.data.length} | QC OK: ${qc.data.length}`);
+      } catch {
         addLog("⚠️ Gagal memuat data dari server");
       }
     }
 
-    // ====== EVENT HANDLER FORM ======
-    document.getElementById('deviceForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const id = document.getElementById('deviceId').value.trim();
-      const name = document.getElementById('deviceName').value.trim();
-
-      if (!id || !name) return addLog("⚠️ Isi semua field sebelum menambah device.");
-
-      const result = await addDevice(id, name);
-      addLog(result);
-      e.target.reset();
-      await refreshData();
-    });
-
-    document.getElementById('qcForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const id = document.getElementById('qcDeviceId').value.trim();
-
-      if (!id) return addLog("⚠️ Isi Device ID sebelum melakukan QC.");
-
-      const result = await qcDevice(id);
-      addLog(result);
-      e.target.reset();
-      await refreshData();
-    });
+    // Load awal
+    refreshData();
   </script>
-
 </body>
 </html>
