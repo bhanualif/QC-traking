@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - QC Tracking</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 400px;
+      padding: 40px 30px;
+      text-align: center;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h2 {
+      margin-bottom: 10px;
+      color: #1e293b;
+      font-weight: 700;
+    }
+    p.subtitle {
+      color: #64748b;
+      margin-bottom: 25px;
+      font-size: 0.9rem;
+    }
+    label {
+      display: block;
+      text-align: left;
+      color: #334155;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 0.95rem;
+      transition: 0.2s;
+    }
+    input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+      outline: none;
+    }
+    button {
+      width: 100%;
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #1e40af;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(37,99,235,0.3);
+    }
+    .message {
+      margin-top: 15px;
+      font-size: 0.9rem;
+    }
+    .success { color: #16a34a; }
+    .error { color: #dc2626; }
+    footer {
+      margin-top: 20px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>QC Tracking</h2>
+    <p class="subtitle">Masuk atau daftar akun baru</p>
+
+    <form id="authForm">
+      <label>Username</label>
+      <input type="text" id="username" placeholder="masukkan username" required>
+      <label>Password</label>
+      <input type="password" id="password" placeholder="masukkan password" required>
+      <button type="submit">Login / Register</button>
+      <p id="msg" class="message"></p>
+    </form>
+
+    <footer>© 2025 QC Tracking</footer>
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:3000";
+    const msg = document.getElementById("msg");
+
+    document.getElementById("authForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      msg.textContent = "";
+      msg.className = "message";
+
+      try {
+        // Coba login
+        let res = await fetch(`${API_BASE}/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+        let data = await res.json();
+
+        if (!res.ok) {
+          // Kalau gagal login → coba register
+          res = await fetch(`${API_BASE}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+          });
+          data = await res.json();
+          if (!res.ok) throw new Error(data.error);
+          msg.classList.add("success");
+          msg.textContent = `✅ ${data.message}, silakan login lagi.`;
+        } else {
+          // Simpan token dan redirect
+          localStorage.setItem("token", data.data.token);
+          msg.classList.add("success");
+          msg.textContent = "🔑 Login berhasil, mengalihkan...";
+          setTimeout(() => (window.location.href = "index.html"), 1000);
+        }
+      } catch (err) {
+        msg.classList.add("error");
+        msg.textContent = `❌ ${err.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
