@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Register - QC Tracking</title>
+  <style>
+    * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+    body {
+      background: linear-gradient(135deg, #1e40af, #2563eb);
+      display: flex; align-items: center; justify-content: center;
+      height: 100vh; margin: 0; padding: 20px;
+    }
+    .container {
+      background: #fff; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      width: 100%; max-width: 400px; padding: 40px 30px; text-align: center;
+    }
+    h2 { color: #1e293b; margin-bottom: 10px; }
+    p.subtitle { color: #64748b; margin-bottom: 25px; }
+    label { display: block; text-align: left; color: #334155; font-weight: 600; margin-bottom: 6px; }
+    input {
+      width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1;
+      border-radius: 8px; margin-bottom: 16px;
+    }
+    button {
+      width: 100%; background: #1e40af; color: white;
+      border: none; padding: 12px; border-radius: 8px;
+      cursor: pointer; font-weight: 600; font-size: 1rem;
+    }
+    button:hover { background: #1e3a8a; }
+    .message { margin-top: 15px; font-size: 0.9rem; }
+    .success { color: #16a34a; }
+    .error { color: #dc2626; }
+    a { display: inline-block; margin-top: 15px; color: #2563eb; text-decoration: none; font-size: 0.9rem; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Daftar Akun</h2>
+    <p class="subtitle">Buat akun baru untuk akses QC Tracking</p>
+
+    <form id="registerForm">
+      <label>Username</label>
+      <input type="text" id="username" required>
+      <label>Password</label>
+      <input type="password" id="password" required>
+      <button type="submit">Daftar</button>
+      <p id="msg" class="message"></p>
+    </form>
+
+    <a href="login.html">Sudah punya akun? Masuk di sini</a>
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:3000";
+    const msg = document.getElementById("msg");
+
+    document.getElementById("registerForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      msg.textContent = "";
+      msg.className = "message";
+
+      try {
+        const res = await fetch(`${API_BASE}/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        msg.classList.add("success");
+        msg.textContent = "✅ Berhasil daftar! Silakan login...";
+        setTimeout(() => (window.location.href = "login.html"), 1200);
+
+      } catch (err) {
+        msg.classList.add("error");
+        msg.textContent = `❌ ${err.message}`;
+      }
+    });
+  </script>
+
+</body>
+</html>
+
